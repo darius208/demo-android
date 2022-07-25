@@ -1,73 +1,167 @@
 package com.darius.chatdemo.ui.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.darius.chatdemo.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Composable
 fun Conversation() {
     var text by remember {
         mutableStateOf(TextFieldValue(""))
     }
+    var listMessage by remember {
+        mutableStateOf(SampleData.conversationSample)
+    }
     Box(
-        Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()) {
-        Conversation(SampleData.conversationSample)
-        Row(modifier = Modifier.align(Alignment.BottomEnd),
-            verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier
-                    .weight(0.5f)
-                    .height(IntrinsicSize.Min)) {
-                Button(onClick = { /*TODO*/ }, Modifier.fillMaxHeight()) {
-                    Text("+")
-                }
-            }
-            Box(
-                Modifier
-                    .weight(4.5f)
-                    .height(IntrinsicSize.Min)) {
-                TextField(
-                    value = text ,
-                    onValueChange = {newText->
-                        text = newText
-                    },
+        Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.align(Alignment.BottomEnd)) {
+            Conversation(listMessage)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
                     Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth())
-            }
-            Box(
-                Modifier
-                    .weight(1f)
-                    .height(IntrinsicSize.Min)) {
-                Button(onClick = { text = TextFieldValue("") }, Modifier.fillMaxHeight()) {
-                    Text("send", textAlign = TextAlign.Center)
+                        .weight(0.5f)
+                        .height(IntrinsicSize.Min)) {
+                    Button(onClick = { /*TODO*/ }, Modifier.fillMaxHeight()) {
+                        Text("+")
+                    }
                 }
+                Box(
+                    Modifier
+                        .weight(4.5f)
+                        .height(IntrinsicSize.Min)) {
+                    TextField(
+                        value = text ,
+                        onValueChange = {newText->
+                            text = newText
+                        },
+                        Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth())
+                }
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .height(IntrinsicSize.Min)) {
+                    Button(onClick = {
+                        val date = Calendar.getInstance()
+                        val df = SimpleDateFormat("yyyy.MM.dd HH:mm")
+                        val newList = ArrayList(listMessage)
+                        println(date)
+                        if (text.text.length > 0) {
+//                            newList.add(TextMessage(
+//                                listMessage.size+1,
+//                                "Outbound",
+//                                df.parse(Date().toString()).time,
+//                                "Bob",
+//                                "Sally",
+//                                text.text,
+//                                "Delivered",
+//                                df.parse(Date().toString()).time
+//                            ))
+                            println("sdfasfasdfasdf")
+                            listMessage = newList
+                        }
+                        text = TextFieldValue("") },
+                        Modifier.fillMaxHeight()) {
+                        Text("send", textAlign = TextAlign.Center)
+                    }
+                }
+
             }
-
-
         }
+
     }
 }
 
 @Composable
 fun MessageCard(msg: TextMessage) {
+    Row(modifier = Modifier
+        .padding(all = 8.dp)
+        .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = if (msg.direction == "Incoming") Arrangement.Start else Arrangement.End) {
+        if (msg.direction == "Incoming") {
+            Image(
+                painter = painterResource(id = R.drawable.icybay),
+                contentDescription = "Contact profile picture",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Row(Modifier.height(IntrinsicSize.Max)) {
+            if (msg.direction == "Incoming") {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = Color.LightGray,
+                            shape = TriangleEdgeShape(20, false)
+                        )
+                        .width(8.dp)
+                        .fillMaxHeight()
+                ) {
+
+                }
+            }
+            Column(horizontalAlignment = if (msg.direction == "Incoming") Alignment.Start else Alignment.End,
+                modifier = Modifier.background(
+                    color = if (msg.direction == "Incoming") Color.LightGray else Color.Cyan,
+                    shape = if (msg.direction == "Outbound") RoundedCornerShape(6.dp, 6.dp, 0.dp, 6.dp) else RoundedCornerShape(6.dp, 6.dp, 6.dp, 0.dp))) {
+                Text(
+                    text = msg.message,
+                    modifier = Modifier.padding(all = 4.dp),
+                    style = MaterialTheme.typography.body2
+
+                )
+            }
+            if (msg.direction == "Outbound"){
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Cyan,
+                            shape = TriangleEdgeShape(20, true)
+                        )
+                        .width(8.dp)
+                        .fillMaxHeight()
+                ) {
+
+                }
+            }
+
+        }
+
+
+    }
+}
+
+@Composable
+fun ImageCard(msg: ImageMessage) {
+    val image: Painter = painterResource(id = msg.imageURL)
     Row(modifier = Modifier
         .padding(all = 8.dp)
         .fillMaxWidth(),
@@ -84,25 +178,56 @@ fun MessageCard(msg: TextMessage) {
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
+        Row(Modifier.height(IntrinsicSize.Max),
+            verticalAlignment = Alignment.Bottom) {
+            if (msg.direction == "Incoming") {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = Color.LightGray,
+                            shape = TriangleEdgeShape(20, false)
+                        )
+                        .width(8.dp)
+                        .fillMaxHeight()
+                ) {
 
-        Column(horizontalAlignment = if (msg.direction == "Incoming") Alignment.Start else Alignment.End) {
-            Text(
-                text = msg.senderId,
-                color = MaterialTheme.colors.secondaryVariant,
-                style = MaterialTheme.typography.subtitle2
-            )
-            Surface(
-                shape = MaterialTheme.shapes.medium, elevation = 1.dp
-            ) {
-
+                }
             }
-            Text(
-                text = msg.message,
-                modifier = Modifier.padding(all = 4.dp),
-                style = MaterialTheme.typography.body2
+            Column(horizontalAlignment = if (msg.direction == "Incoming") Alignment.Start else Alignment.End,
+                modifier = Modifier
+                    .background(
+                        color = if (msg.direction == "Incoming") Color.LightGray else Color.Cyan,
+                        shape = if (msg.direction == "Outbound") RoundedCornerShape(
+                            6.dp,
+                            6.dp,
+                            0.dp,
+                            6.dp
+                        ) else RoundedCornerShape(6.dp, 6.dp, 6.dp, 0.dp)
+                    )
+                    .padding(10.dp)) {
+                Image(
+                    painter = image,
+                    contentDescription = "",
+                    modifier = Modifier.size(200.dp)
+                )
+            }
+            if (msg.direction == "Outbound"){
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Cyan,
+                            shape = TriangleEdgeShape(20, true)
+                        )
+                        .width(8.dp)
+                        .fillMaxHeight()
+                ) {
 
-            )
+                }
+            }
+
         }
+
+
     }
 }
 
@@ -117,6 +242,9 @@ fun Conversation(messages: List<Any>) {
             if(message is TextMessage) {
                 MessageCard(message)
             }
+            if (message is ImageMessage) {
+                ImageCard(message)
+            }
 
         }
     }
@@ -124,24 +252,24 @@ fun Conversation(messages: List<Any>) {
 data class TextMessage(
     val id: Int,
     val direction: String,
-    val timestamp: Int,
+    val timestamp: Long,
     val senderId: String,
     val destinationID: String,
     val message: String,
     val deliveryStatus: String,
-    val deliveryTimestamp: Int
+    val deliveryTimestamp: Long
 )
 
 data class ImageMessage(
     val id: Int,
     val direction: String,
-    val timestamp: Int,
+    val timestamp: Long,
     val senderId: String,
     val destinationID: String,
-    val imageURL: String,
+    val imageURL: Int,
     val thumbnailURL: String,
     val deliveryStatus: String,
-    val deliveryTimestamp: Int
+    val deliveryTimestamp: Long
 )
 
 
@@ -174,12 +302,23 @@ object SampleData {
             1589467569
         ),
         ImageMessage(
-            3,
+            4,
             "Incoming",
             1589485467,
             "Bob",
             "Sally",
-            "turtlerock",
+            R.drawable.icybay,
+            "https://thumbnail.image.url",
+            "Delivered",
+            1589485467
+        ),
+        ImageMessage(
+            4,
+            "Outbound",
+            1589485467,
+            "Bob",
+            "Sally",
+            R.drawable.twinlake,
             "https://thumbnail.image.url",
             "Delivered",
             1589485467

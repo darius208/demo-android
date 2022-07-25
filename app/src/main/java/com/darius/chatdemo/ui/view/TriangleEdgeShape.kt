@@ -31,9 +31,10 @@ class TriangleEdgeShape(val offset: Int, val position: Boolean) : Shape {
             return Outline.Generic(path = trianglePath)
         }
         val trianglePath = Path().apply {
-            moveTo(x = 0f, y = size.height - offset)
-            lineTo(x = 0f, y = size.height)
-            lineTo(x = 0f + offset, y = size.height)
+            moveTo(x = 0f, y = size.height)
+
+            lineTo(x = 20f, y = size.height - 20)
+            lineTo(x = 20f + offset, y = size.height)
         }
         return Outline.Generic(path = trianglePath)
     }
@@ -44,24 +45,25 @@ class TriangleEdgeShape(val offset: Int, val position: Boolean) : Shape {
 fun TriangleReview() {
     Row(Modifier.height(IntrinsicSize.Max)) {
         Column(
-            modifier = Modifier
-                .background(
-                    color = Color.Blue,
-                    shape = RoundedCornerShape(4.dp, 4.dp, 0.dp, 4.dp)
-                )
-                .width(30.dp)
-        ) {
-            Text("Chat")
-        }
-        Column(
             modifier = Modifier.background(
                 color = Color.Blue,
-                shape = TriangleEdgeShape(10, true)
+                shape = TriangleEdgeShape(10, false)
             ).width(8.dp)
                 .fillMaxHeight()
         ) {
 
         }
+        Column(
+            modifier = Modifier
+                .background(
+                    color = Color.Blue,
+                    shape = RoundedCornerShape(4.dp, 4.dp, 4.dp, 0.dp)
+                )
+                .width(30.dp)
+        ) {
+            Text("Chat")
+        }
+
 
     }
 }
