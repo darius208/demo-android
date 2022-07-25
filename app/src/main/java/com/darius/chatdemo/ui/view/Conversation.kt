@@ -36,7 +36,7 @@ fun Conversation() {
         mutableStateOf(SampleData.conversationSample)
     }
         Column(verticalArrangement = Arrangement.Bottom, modifier = Modifier.fillMaxSize()) {
-            Conversation(listMessage)
+            Conversation(listMessage, modifier = Modifier.weight(1f))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier
@@ -230,22 +230,26 @@ fun ImageCard(msg: ImageMessage) {
 }
 
 @Composable
-fun Conversation(messages: List<Any>) {
+fun Conversation(messages: List<Any>, modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
     LaunchedEffect(messages.size) {
         listState.animateScrollToItem(messages.size)
     }
-    LazyColumn(state = listState){
-        items(messages) { message ->
-            if(message is TextMessage) {
-                MessageCard(message)
-            }
-            if (message is ImageMessage) {
-                ImageCard(message)
-            }
+    Box(modifier = modifier,
+        contentAlignment = Alignment.BottomEnd) {
+        LazyColumn(state = listState){
+            items(messages) { message ->
+                if(message is TextMessage) {
+                    MessageCard(message)
+                }
+                if (message is ImageMessage) {
+                    ImageCard(message)
+                }
 
+            }
         }
     }
+
 }
 data class TextMessage(
     val id: Int,
