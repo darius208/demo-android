@@ -35,9 +35,7 @@ fun Conversation() {
     var listMessage by remember {
         mutableStateOf(SampleData.conversationSample)
     }
-    Box(
-        Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.align(Alignment.BottomEnd)) {
+        Column(verticalArrangement = Arrangement.Bottom, modifier = Modifier.fillMaxSize()) {
             Conversation(listMessage)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
@@ -66,21 +64,22 @@ fun Conversation() {
                         .weight(1f)
                         .height(IntrinsicSize.Min)) {
                     Button(onClick = {
-                        val date = Calendar.getInstance()
+                        val date = Date()
+                        val format = SimpleDateFormat("yyyy.MM.dd HH:mm")
                         val df = SimpleDateFormat("yyyy.MM.dd HH:mm")
                         val newList = ArrayList(listMessage)
-                        println(date)
+                        println(df.parse(format.format(date)).time)
                         if (text.text.length > 0) {
-//                            newList.add(TextMessage(
-//                                listMessage.size+1,
-//                                "Outbound",
-//                                df.parse(Date().toString()).time,
-//                                "Bob",
-//                                "Sally",
-//                                text.text,
-//                                "Delivered",
-//                                df.parse(Date().toString()).time
-//                            ))
+                            newList.add(TextMessage(
+                                listMessage.size+1,
+                                "Outbound",
+                                df.parse(format.format(date)).time,
+                                "Bob",
+                                "Sally",
+                                text.text,
+                                "Delivered",
+                                df.parse(format.format(date)).time
+                            ))
                             println("sdfasfasdfasdf")
                             listMessage = newList
                         }
@@ -91,7 +90,6 @@ fun Conversation() {
                 }
 
             }
-        }
 
     }
 }
